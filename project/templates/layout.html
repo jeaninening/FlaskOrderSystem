@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}订单平台{% endblock %}</title>
+    <link rel="stylesheet" href="/static/bootstrap-5.2.3/css/bootstrap.css">
+    <!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"-->
+    <!--          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">-->
+    <!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"-->
+    <!--            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"-->
+    <!--            crossorigin="anonymous"></script>-->
+    <style>
+        .content {
+            padding: 24px;
+        }
+
+        .content-border {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 24px;
+            margin-left: 10%;
+            margin-right: 10%;
+        }
+
+        .order-list-title {
+            margin: 0 10% 12px;
+        }
+
+        .table-wrapper {
+            margin-left: 10%;
+            margin-right: 10%;
+        }
+
+        .button-wrapper {
+            margin-left: 10%;
+            margin-bottom: 24px;
+        }
+
+        .dropdown-menu[data-bs-popper] {
+            left: -86px;
+        }
+
+    </style>
+</head>
+<script src="/static/bootstrap-5.2.3/js/bootstrap.bundle.js"></script>
+{% set role_set = {
+    1:'客户',
+    2:'管理员'
+} %}
+
+<body style="width: 100%">
+
+<nav class="navbar navbar-expand-lg bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">后台系统</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">用户管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/order/list">订单管理</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav d-flex">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        {{get_real_name().real_name}}
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">tel: {{get_real_name().phone}}</a></li>
+                        <li><a class="dropdown-item" href="#">角色: {{role_set[get_real_name().role]}}</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li onclick="handleLogout()"><a class="dropdown-item" href="#">退出登录</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="content">
+    {%block body%}{%endblock%}
+</div>
+<footer>
+    {% block footer %}
+    <p style="text-align: center">&copy; 2026 My Website</p>
+    {% endblock %}
+</footer>
+<script>
+    function handleLogout() {
+        if (confirm('确定要退出登录吗？')) {
+            fetch('/logout', {
+                method: 'POST',
+                credentials: 'same-origin'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.redirect;  // 手动跳转
+                    }
+                })
+                .catch(error => {
+                    console.error('退出失败:', error);
+                    alert('退出失败');
+                });
+        }
+    }
+</script>
+</body>
+</html>

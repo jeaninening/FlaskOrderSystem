@@ -1,0 +1,110 @@
+{% extends 'layout.html' %}
+{% block title %}订单列表{% endblock %}
+{% block body %}
+<div class="order-list-title">
+    <h4>订单列表</h4>
+</div>
+<button type="button" class="btn btn-primary button-wrapper"
+        onclick="location.href='{{ url_for('order.order_create') }}'">添加
+</button>
+<div class="table-wrapper">
+    <table class="table table-hover table-bordered">
+        <thead>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                URL
+            </th>
+            <th>
+                数量
+            </th>
+            <th>
+                用户
+            </th>
+            <th>
+                状态
+            </th>
+            <th>
+                操作
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if data_list %}
+        {% for item in data_list %}
+        <tr>
+            <th>{{item.id}}</th>
+            <th>{{item.url}}</th>
+            <th>{{item.count}}</th>
+            <th>{{item.real_name}}</th>
+            <th><span class="badge {{status_dict[item.status][1]}}">{{status_dict[item.status][0]}}</span></th>
+            <th class="d-flex justify-content-between">
+
+                <div onclick="location.href='{{ url_for('order.order_update', id=item.id) }}'" style="cursor: pointer">
+                    <img src="{{ url_for('static', filename='edit.svg') }}"
+                         alt="编辑"
+                         style="width: 16px; height: 16px;"/>
+                </div>
+                <div onclick="handleDelete(`{{item.id}}`)" style="cursor: pointer">
+                    <img src="{{ url_for('static', filename='trash.svg') }}"
+                         alt="删除"
+                         style="width: 16px; height: 16px;"/>
+                </div>
+            </th>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="5" style="text-align: center; line-height: 200px;  height:200px">暂无数据</td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+<script>
+    function handleDelete(id) {
+        if (confirm('确定要删除吗？')) {
+            fetch(`/order/delete`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({id: id})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.redirect;
+                    } else {
+                        alert(data.message || '删除失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('删除失败:', error);
+                });
+        }
+    }
+</script>
+{%endblock%}
+
+
